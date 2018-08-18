@@ -75,3 +75,64 @@ Self Preservation mode (server side) - When the heartbeat is not reached from mi
 By default SPM is 70% [not configurable]
 
 
+### Day 3 ###
+## Ribbon [Netflix][Loadbalancing]
+https://dzone.com/articles/microservices-tutorial-ribbon-as-a-load-balancer-1
+
+--> Uses by default Dynamicserverlistloadbalancer() for load balancing.
+--> To enable Ribbon in DashBoard
+
+<dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-ribbon</artifactId>
+</dependency>
+
+Loadbalancer should retry to other servers, incase one of the service is failed, in absence of fallback server.
+Manual method to retry the hits of service - try-catch, or any other logic.
+Replacement in Spring;
+  SpringRetry Module - Retry template [unlike try-catch]
+  
+spring:
+  cloud:
+    loadbalancer:
+      retry:
+        enabled: true // by default false
+        
+        
+quotes-service:     // service name - multiple service per config
+  ribbon:
+    ReadTimeout: 1000
+    ConnectTimeout: 1000
+    OkToRetryOnAllOperations: true
+    MaxAutoRetriesNextServer: 2   // max number of retries for all service
+    MaxAutoRetries: 0        // retry per service instance
+
+
+##** Loadbalancer algorithms
+RoundRobin, ...
+Portfolio service --> Intercepter --> IRule.choose() --> ILoadbalancer
+
+## Hystrix [Netflix] [Fallback service]
+Wiki Page - https://github.com/Netflix/Hystrix/wiki/Configuration
+
+--> Applies to methods / functions only.
+--> Fallback method signature should be same as the original method.
+--> Fallback method logic should be in Portfolio service.
+
+  # Thread Pool & Hystrix
+    --> Internally hystrix uses threadpool.
+    --> Hystrix Dashboard
+   
+   
+ ## Feign
+ 
+ ## ZUUL [Netflix]
+ 
+ ## Config Server
+  --> Keeps centralized configuration repository for all the jars / services.
+  --> Name of each config file specific to jar should start with the service name.
+  --> All common configs for the jars / services should be kept in application.properties.
+  --> All these config files should be put into some repository. (git, svn, ...).
+  --> Response is json.
+  --> Config server should be highly available. ----------> Disadvantage. If it is down no application would launch.
+  --> Config server should use source repository API calls.
